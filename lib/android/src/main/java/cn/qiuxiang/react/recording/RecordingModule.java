@@ -114,13 +114,18 @@ class RecordingModule extends ReactContextBaseJavaModule {
 
     private void recording() {
         short buffer[] = new short[bufferSize];
-        while (running && !reactContext.getCatalystInstance().isDestroyed()) {
-            WritableArray data = Arguments.createArray();
-            audioRecord.read(buffer, 0, bufferSize);
-            for (float value : buffer) {
-                data.pushInt((int) value);
+        while (running) {
+            try{
+                WritableArray data = Arguments.createArray();
+                audioRecord.read(buffer, 0, bufferSize);
+                for (float value : buffer) {
+                    data.pushInt((int) value);
+                }
+                eventEmitter.emit("recording", data);
+            } catch (Exception e) {
+                e.printStackTrace();
+                break;  // Exit loop on error
             }
-            eventEmitter.emit("recording", data);
         }
     }
 }
